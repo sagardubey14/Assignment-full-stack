@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 const { SECRET_KEY, TOKEN_EXPIRATION_TIME } = require('../config/tokenConfig');
 
 const signup = async (req, res) => {
+    console.log(req.body);
     const { username, email, password } = req.body;
     try {
         const existingUser = await userModel.findOne({ email: email });

@@ -3,12 +3,20 @@ const dbConfig = require('./config/dbConfig')
 const authRoutes = require('./routes/authRoutes')
 const postRoutes = require('./routes/postRoutes')
 const jwt = require('jsonwebtoken')
+const cors = require('cors')
+const bodyParser = require('body-parser')
 
 
 const app = express()
-app.use(express.json())
+app.use(cors())
+app.use(bodyParser.json())
 dbConfig.connect()
-app.use("/auth", authRoutes)
+function check(req,res,next){
+    console.log(req.body)
+    console.log(res.body);
+    next()
+}
+app.use("/auth",check, authRoutes)
 
 
 app.use("/posts", postRoutes)
