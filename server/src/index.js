@@ -13,13 +13,12 @@ app.use(bodyParser.json())
 dbConfig.connect()
 function check(req,res,next){
     console.log(req.body)
-    console.log(res.body);
     next()
 }
 app.use("/auth",check, authRoutes)
 
 
-app.use("/posts", postRoutes)
+app.use("/posts",check , postRoutes)
 
 app.get("/", (req, res)=>{
     res.status(200).send("hello")

@@ -14,11 +14,11 @@ postRoutes.get('/',authenticateToken ,getPosts);
 function authenticateToken(req,res,next){
     try {
         const authHeader = req.headers['authorization']
-        console.log(authHeader);
         if (authHeader){
             const token = authHeader.split(" ")[1]
             let user = jwt.verify(token,SECRET_KEY)
             req.userId = user.id
+            req.token = token
         }
         else{
             res.status(401).send("unaothrized")

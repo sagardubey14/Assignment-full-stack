@@ -3,6 +3,8 @@ import SignUpForm from './Components/SignupForm';
 import { Link, Route, Routes } from 'react-router-dom'
 import LoginForm from './Components/LoginForm';
 import Posts from './Components/Posts';
+import Home from './Components/Home';
+import UserContextProvider from './Context/UserContextProvider';
 
 
 function App() {
@@ -19,7 +21,7 @@ function App() {
     )
   }
   return (
-    <div>
+    <UserContextProvider>
       hello
       <button onClick={handleClick}>Call to server</button>
       <nav>
@@ -36,11 +38,12 @@ function App() {
       </ul>
     </nav>
       <Routes>
+      <Route path='/' element={<Home />}/>
         <Route path='/posts' element={<Posts />}/>
         <Route path='/signup' element={<SignUpForm />}/>
         <Route path='/login' element={<LoginForm />}/>
       </Routes>
-    </div>
+    </UserContextProvider>
   )
 }
 

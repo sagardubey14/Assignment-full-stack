@@ -1,9 +1,14 @@
 
-import { useState } from 'react';
+import { useState,useContext } from 'react';
 import { validateEmail, validatePassword } from '../utils/validation';
 import axios from 'axios'
+import UserContext from '../Context/UserContext';
+import { useNavigate } from 'react-router-dom';
+
 
 const LoginForm = () => {
+  const navigate = useNavigate()
+  const {profile, setProfile} = useContext(UserContext)
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -23,9 +28,10 @@ const LoginForm = () => {
       try {
         const { email, password } = formData
         const response = await axios.post('http://localhost:3001/auth/signin' , {email, password})
-        console.log(response);
-        const {user , token} = response.data
-        console.log(user,token);
+        
+        setProfile({user:response.data.user,token:response.data.token})
+        console.log(profile)
+        navigate("/posts")
       } catch (error) {
         console.log(error);
       }
@@ -34,6 +40,7 @@ const LoginForm = () => {
       console.log('not good');
     }
   };
+
 
   const validateForm = () => {
     const { email, password } = formData;

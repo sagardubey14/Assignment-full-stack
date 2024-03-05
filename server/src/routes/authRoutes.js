@@ -7,6 +7,6 @@ function check(req,res,next){
     next()
 }
 authRoutes.post("/signup",check, signup)
-authRoutes.post("/signin", signin)
+authRoutes.post("/signin",check , signin)
 
 module.exports = authRoutes;
