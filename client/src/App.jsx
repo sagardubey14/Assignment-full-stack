@@ -27,9 +27,6 @@ function App() {
       <nav>
       <ul>
         <li>
-        <Link to='/posts'>POSTS</Link>
-        </li>
-        <li>
         <Link to='/signup'>Signup</Link>
         </li>
         <li>

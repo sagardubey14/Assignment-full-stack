@@ -8,10 +8,10 @@ import { useNavigate } from 'react-router-dom';
 
 const LoginForm = () => {
   const navigate = useNavigate()
-  const {profile, setProfile} = useContext(UserContext)
+  const { setProfile} = useContext(UserContext)
   const [formData, setFormData] = useState({
-    email: '',
-    password: '',
+    email: 'first@gmail.com',
+    password: '12345678',
   });
 
   const handleChange = (e) => {
@@ -28,9 +28,8 @@ const LoginForm = () => {
       try {
         const { email, password } = formData
         const response = await axios.post('http://localhost:3001/auth/signin' , {email, password})
-        
-        setProfile({user:response.data.user,token:response.data.token})
-        console.log(profile)
+        const {user,sesID} = response.data
+        setProfile({user,sesID})
         navigate("/posts")
       } catch (error) {
         console.log(error);

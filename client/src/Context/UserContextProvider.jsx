@@ -4,8 +4,13 @@ import UserContext from "./UserContext";
 
 const UserContextProvider = ({children}) => {
     const [profile,setProfile] = useState({
-        user:{},
-        token:'',
+        user:{
+            name:'',
+            username:'',
+            email:'',
+            pfp:''
+        },
+        sesID:'',
     })
     return(
         <UserContext.Provider value={{profile, setProfile}}>

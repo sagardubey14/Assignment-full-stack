@@ -13,17 +13,31 @@ postRoutes.get('/',authenticateToken ,getPosts);
 
 function authenticateToken(req,res,next){
     try {
-        const authHeader = req.headers['authorization']
-        if (authHeader){
-            const token = authHeader.split(" ")[1]
-            let user = jwt.verify(token,SECRET_KEY)
-            req.userId = user.id
-            req.token = token
+        let mystore = JSON.parse(req.sessionStore.sessions[req.headers['sesid']])
+        let token = mystore['token']
+        if (!token) {
+            // Handle case where token is not found
+            res.status(401).send('Unauthorized');
+            return;
         }
-        else{
-            res.status(401).send("unaothrized")
-        }
+        
+        jwt.verify(token, SECRET_KEY, (err, decoded) => {
+            if (err) {
+            // Token verification failed
+            if (err.name === 'TokenExpiredError') {
+                console.log('Token has expired');
+            } else {
+                console.error('Token verification failed:', err.message);
+            }
+            } else {
+            // Token is valid
+            req.userId = decoded.id
+            console.log(req.userId);
+            }
+        })
+        
         next()
+        
     } catch (error) {
         console.log(error);
     }
