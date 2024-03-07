@@ -1,9 +1,11 @@
 import axios from "axios"
-import UserContext from "../Context/UserContext"
+import UserContext from "../../Context/UserContext"
 import { useContext, useEffect, useState   } from "react"
-import { validateTitle, validateContent } from '../utils/validation';
-import '../Styles/pagination.css'
+import { validateTitle, validateContent } from '../../utils/validation';
 import {useNavigate} from 'react-router-dom'
+import Header from "./Header";
+import PostList from "./PostList";
+import Pagination from "./Pagination";
 
 
 const Posts = ()=> {
@@ -85,8 +87,8 @@ const Posts = ()=> {
         
     }
     if(profile.sesID == ''){
-      alert("not Allowed")
-      navigate("/")
+      // alert("not Allowed")
+      navigate("/login")
     }
     else{
       fetchData();
@@ -97,29 +99,13 @@ const Posts = ()=> {
 
   return (
     <div>
-      POSTS
-      {
-        <div>
-        <label>{profile.user.name}</label><br />
-        <label>{profile.user.username}</label>
-        </div>
-      }
-      <button onClick={()=>logOut()}>Logout</button>
-      {
-        loading?
-        <div>Loading......</div>:
-        error?<div>{error}</div>:
-        <div className="pagination">
-        <ul>
-        {
-         data.map(d =><li key={d._id}>{d.content}</li>) 
-        }
-        </ul>
-        <button id="prevPage" onClick={()=>setPageNumber(prevData=> prevData-1)}>Previous Page</button>
-        <span id="currentPage">Page 1</span>
-        <button id="nextPage" onClick={()=>setPageNumber(prevData=> prevData+1)}>Next Page</button>
-      </div>
-      }
+      <Header profile={profile} logOut={logOut} />
+      {loading ? <div>Loading......</div> : (
+        <>
+          {error ? <div>{error}</div> : <PostList data={data} />}
+          <Pagination pageNumber={pageNumber} setPageNumber={setPageNumber} />
+        </>
+      )}
       <input
         type="text"
         name="title"

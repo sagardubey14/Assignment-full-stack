@@ -6,33 +6,16 @@ const cors = require('cors')
 const bodyParser = require('body-parser')
 const session = require('express-session')
 const cookieParser = require('cookie-parser');
-const { SECRET_KEY} = require('./config/tokenConfig');
 const multer = require('multer')
-const upload = multer({ dest: '../uploads/' });
-
+const upload = multer({ dest: 'uploads/' });
+require('dotenv').config()
 
 const app = express()
 
 app.use(cookieParser())
 
-const singleUpload = upload.single('pfp');
-
-// Middleware function to handle file upload
-function check1(req, res, next) {
-    singleUpload(req, res, function (err) {
-        if (err instanceof multer.MulterError) {
-            // A Multer error occurred during file upload
-            return res.status(400).json({ error: err.message });
-        } else if (err) {
-            // An unknown error occurred during file upload
-            return res.status(500).json({ error: 'Unknown error occurred' });
-        }
-        // No errors, continue to the next middleware or route handler
-        next();
-    });
-}
 app.use(session({
-    secret:SECRET_KEY,
+    secret:process.env.SECRET_KEY,
     resave:false,
     saveUninitialized:false
 }));
@@ -47,7 +30,7 @@ async function check(req,res,next){
     req.sessionID = req.headers['sesid']
     next()
 }
-app.use("/auth",check1 , authRoutes)
+app.use("/auth",upload.single('pfp') , authRoutes)
 
 
 app.use("/posts",check, postRoutes)

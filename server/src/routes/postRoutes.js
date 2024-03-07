@@ -1,8 +1,7 @@
 const express = require('express');
 const { createPost, getPosts } = require('../controllers/postController');
 const jwt = require('jsonwebtoken')
-const { SECRET_KEY } = require('../config/tokenConfig')
-
+require('dotenv').config();
 const postRoutes = express.Router();
 
 // Route to create a new post
@@ -21,7 +20,7 @@ function authenticateToken(req,res,next){
             return;
         }
         
-        jwt.verify(token, SECRET_KEY, (err, decoded) => {
+        jwt.verify(token, process.env.SECRET_KEY , (err, decoded) => {
             if (err) {
             // Token verification failed
             if (err.name === 'TokenExpiredError') {
@@ -32,7 +31,6 @@ function authenticateToken(req,res,next){
             } else {
             // Token is valid
             req.userId = decoded.id
-            console.log(req.userId);
             }
         })
         

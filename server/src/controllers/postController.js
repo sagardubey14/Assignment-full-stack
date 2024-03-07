@@ -30,10 +30,8 @@ const getPosts = async (req, res) => {
         const posts = await Post.find();
 
         const page = Number(req.query.page)||1
-        const startIndex = (page-1)*5
-        const endIndex = (page)*5
-        console.log(req.userId);
-        console.log(posts);
+        const startIndex = (page-1)*10
+        const endIndex = (page)*10
         const result = posts.filter(post => post.userId.toString() === req.userId.toString() )
         const finalResult = result.slice(startIndex,endIndex)
         res.status(200).json({arr:finalResult});
