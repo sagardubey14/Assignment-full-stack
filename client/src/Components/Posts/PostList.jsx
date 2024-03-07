@@ -5,8 +5,11 @@ const PostList = ({ data }) => {
     <div className='unLI'>
       {data.map(d => 
       <div className="posts-container" key={d._id}>
-        <p className='title'>{d.title}</p>
-        <p className='content'>{d.content}</p>
+        <p>{d._id}</p>
+        <div>HELLO</div>
+        <div>HELLO</div>
+        <div>HELLO</div>
+        <div>HELLO</div>
       </div>)}
     </div>
   );

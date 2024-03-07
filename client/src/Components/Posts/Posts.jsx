@@ -14,7 +14,7 @@ const Posts = ()=> {
   const {profile, setProfile} = useContext(UserContext)
   const [content,setContent] = useState("")
   const [title,setTitle] = useState("")
-  const [data, setData] = useState(null);
+  const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   
@@ -75,10 +75,11 @@ const Posts = ()=> {
 
   useEffect(()=>{
     const fetchData = async ()=>{
-        axios.get(`http://localhost:3001/posts?page=${pageNumber}`,{headers})
+        axios.get(`http://localhost:3001/posts?page=${pageNumber}&pageSize=5`,{headers})
         .then(res=>{
-          setData(res.data.arr)
+          setData(prev => [...prev,...res.data.arr])
           setLoading(false)
+          console.log(data);
         })
         .catch(err=>{
           setError(err)
@@ -96,16 +97,32 @@ const Posts = ()=> {
     
   },[pageNumber])
 
+  const handleScroll = ()=>{
+    // console.log(document.documentElement.scrollHeight);
+    // console.log(document.documentElement.scrollTop);
+    // console.log('Height: ',window.innerHeight);
+
+    if(
+      window.innerHeight + document.documentElement.scrollTop +1 >=
+      document.documentElement.scrollHeight
+    ){
+      setPageNumber(prev=>prev+1)
+    }
+  }
+
+  useEffect(()=>{
+    window.addEventListener("scroll", handleScroll)
+    setLoading(true)
+    return () => window.removeEventListener("scroll", handleScroll)
+  },[])
+
 
   return (
     <div>
       <Header profile={profile} logOut={logOut} />
-      {loading ? <div>Loading......</div> : (
-        <>
-          {error ? <div>{error}</div> : <PostList data={data} />}
-          <Pagination pageNumber={pageNumber} setPageNumber={setPageNumber} />
-        </>
-      )}
+      <PostList data={data} />
+      {loading && <p>Loading....</p>}
+      {error && console.log(error)}
       <input
         type="text"
         name="title"

@@ -26,15 +26,27 @@ const createPost = async (req, res) => {
 // Controller function to get all posts
 const getPosts = async (req, res) => {
     try {
-        // Fetch all posts from the database
-        const posts = await Post.find();
-
         const page = Number(req.query.page)||1
-        const startIndex = (page-1)*10
-        const endIndex = (page)*10
-        const result = posts.filter(post => post.userId.toString() === req.userId.toString() )
-        const finalResult = result.slice(startIndex,endIndex)
-        res.status(200).json({arr:finalResult});
+
+        const pageSize = Number(req.query.pageSize) || 5;
+
+        const totalCount = await Post.countDocuments()
+        const totalPages = Math.ceil(totalCount / pageSize);
+
+        if (page < 1 || page > totalPages) {
+            return res.status(400).json({ message: 'Invalid page number' });
+        }
+
+        const adjustedPage = Math.min(page, totalPages);
+        const skip = (adjustedPage - 1) * pageSize;
+        
+        const data = await Post.find().skip(skip).limit(pageSize);
+
+        res.status(200).json({
+            totalPages: totalPages,
+            currentPage: page,
+            arr: data
+        });
 
     } catch (error) {
         console.error('Error fetching posts:', error);
