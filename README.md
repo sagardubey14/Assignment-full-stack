@@ -41,7 +41,7 @@ MelodyVerse is a full-stack web application that allows users to create posts, i
 ![Footer](/ScreenShots/Footer.png)
 ![Home](/ScreenShots/Home.png)
 ![Infinite_Scroll_1](/ScreenShots/infinite_scroll.png)
-![Infinite_Scroll_2](/ScreenShots/infinite_scroll_2.png)
+![Infinite_Scroll_2](/ScreenShots/infinite_scroll2.png)
 ![Pagination](/ScreenShots/pagination.png)
 ![Post_with_Success_Message](/ScreenShots/Post_with_Succes-msg.png)
 ![Profile](/ScreenShots/Profile.png)
