@@ -9,7 +9,7 @@ function check(req,res,next){
 }
 // Multer middleware for file upload
 
-authRoutes.post("/signup",check , signup)
+authRoutes.post("/signup" , signup)
 authRoutes.post("/signin", signin)
 authRoutes.post("/logout", logout)
 

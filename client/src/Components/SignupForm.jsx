@@ -1,4 +1,6 @@
 import { useContext, useState } from 'react';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate } from 'react-router-dom';
 import { validateEmail, validatePassword } from '../utils/validation';
 import axios from 'axios'
@@ -7,7 +9,7 @@ import UserContext from '../Context/UserContext';
 const SignUpForm = () => {
   const navigate = useNavigate()
   const {setProfile} = useContext(UserContext)
-  
+  const [termsChecked,setTermsChecked] = useState(false)
   const [formData, setFormData] = useState({
     name:'',
     username:'',
@@ -16,7 +18,12 @@ const SignUpForm = () => {
     confirmPassword: '',
     pfp:'',
   });
-
+  const [formErrors, setFormErrors] = useState({
+    email: '',
+    password: '',
+    confirmPassword: '',
+    terms:''
+  });
   
 
   const handleChange = (e) => {
@@ -28,7 +35,7 @@ const SignUpForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(formData.pfp);
+
     // Validate form data before submitting
     if (validateForm()) {
       try {
@@ -48,32 +55,109 @@ const SignUpForm = () => {
         })
         const {user,sesID} = response.data
         setProfile({user,sesID})
+        toast.success(`Welcome ${user.email}`, {
+          position: "top-center",
+          autoClose: 5000,
+          hideProgressBar: true,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          });
+
         navigate("/posts")
       } catch (error) {
-        console.log(error);
+        if (error.response && error.response.status === 400 && error.response.data === "User already exists") {
+          // Display error message to the user using react-toastify
+          toast.error('User already exists', {
+            position: "top-center",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+            });
+        } else {
+          toast.error('Something Went Wrong', {
+            position: "top-center",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+            });
+          console.log('An error occurred:', error.message);
+        }
       }
     }
     else{
-      console.log('not good');
+      console.log('Form validation failed');
+      setTimeout(() => {
+        setFormErrors({
+          email: '',
+          password: '',
+          confirmPassword: '',
+        });
+      }, 3000)
     }
   };
 
   const validateForm = () => {
     const { email, password, confirmPassword } = formData;
-    // Perform validation checks using the utility functions
+    let isValid = true;
+
     if (!validateEmail(email)) {
-      console.error('Invalid email address');
-      return false;
+      setFormErrors((prevErrors) => ({
+        ...prevErrors,
+        email: 'Invalid email address',
+      }));
+      isValid = false;
+    } else {
+      setFormErrors((prevErrors) => ({
+        ...prevErrors,
+        email: '',
+      }));
     }
+
     if (!validatePassword(password)) {
-      console.error('Password must be at least 8 characters long');
-      return false;
+      setFormErrors((prevErrors) => ({
+        ...prevErrors,
+        password: 'Password must be at least 8 characters long',
+      }));
+      isValid = false;
+    } else {
+      setFormErrors((prevErrors) => ({
+        ...prevErrors,
+        password: '',
+      }));
     }
+
     if (password !== confirmPassword) {
-      console.error('Passwords do not match');
-      return false;
+      setFormErrors((prevErrors) => ({
+        ...prevErrors,
+        confirmPassword: 'Passwords do not match',
+      }));
+      isValid = false;
+    } else {
+      setFormErrors((prevErrors) => ({
+        ...prevErrors,
+        confirmPassword: '',
+      }));
     }
-    return true;
+    if(!termsChecked){
+      setFormErrors((prevErrors) => ({
+        ...prevErrors,
+        terms: 'Please agree to the terms and conditions',
+      }));
+      isValid = false;
+    }
+
+    return isValid;
   };
 
   return (
@@ -89,6 +173,7 @@ const SignUpForm = () => {
         placeholder="Name"
         className="block w-full my-5 px-4 py-2 rounded-md border border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm transition-all duration-300 ease-in-out hover:border-indigo-500 hover:ring-indigo-500"
       />
+
       <label className="block text-sm font-medium leading-6 text-gray-900">Username</label>
       <input
         type="text"
@@ -107,6 +192,7 @@ const SignUpForm = () => {
         placeholder="Email"
         className="block w-full my-5 px-4 py-2 rounded-md border border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm transition-all duration-300 ease-in-out hover:border-indigo-500 hover:ring-indigo-500"
       />
+      {formErrors.email && <p className="text-red-500 text-sm mt-1">{formErrors.email}</p>}
       <label className="block text-sm font-medium leading-6 text-gray-900">Password</label>
       <input
         type="password"
@@ -116,6 +202,7 @@ const SignUpForm = () => {
         placeholder="Password"
         className="block w-full my-5 px-4 py-2 rounded-md border border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm transition-all duration-300 ease-in-out hover:border-indigo-500 hover:ring-indigo-500"
       />
+      {formErrors.password && <p className="text-red-500 text-sm mt-1">{formErrors.password}</p>}
       <input
         type="password"
         name="confirmPassword"
@@ -124,6 +211,7 @@ const SignUpForm = () => {
         placeholder="Confirm Password"
         className="block w-full my-5 px-4 py-2 rounded-md border border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm transition-all duration-300 ease-in-out hover:border-indigo-500 hover:ring-indigo-500"
       />
+      {formErrors.confirmPassword && <p className="text-red-500 text-sm mt-1">{formErrors.confirmPassword}</p>}
       <label className="block text-sm font-medium leading-6 text-gray-900">
       Upload Profile Picture
       </label>
@@ -146,12 +234,13 @@ const SignUpForm = () => {
       
       <div className="flex items-start">
           <div className="flex items-center h-5">
-            <input id="remember" aria-describedby="remember" type="checkbox" className="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-primary-300 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-primary-600 dark:ring-offset-gray-800" required="" />
+            <input onClick={ (e) => setTermsChecked(e.target.checked)} id="remember" aria-describedby="remember" type="checkbox" className="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-primary-300 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-primary-600 dark:ring-offset-gray-800" required="" />
           </div>
           <div className="ml-3 text-sm">
             <label className="text-sm font-medium leading-6 text-gray-900">Terms and conditions</label>
-          </div>
+          </div>          
       </div>
+      {!termsChecked && <p className="text-red-500 text-sm mt-1">{formErrors.terms}</p>}
 
       <button type="submit" className="mt-5 bg-indigo-500 text-white font-semibold py-2 px-4 rounded hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500">
         Sign Up

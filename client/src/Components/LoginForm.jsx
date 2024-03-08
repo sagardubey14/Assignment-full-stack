@@ -1,4 +1,5 @@
-
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import { useState,useContext } from 'react';
 import { validateEmail, validatePassword } from '../utils/validation';
 import axios from 'axios'
@@ -11,6 +12,10 @@ const LoginForm = () => {
   const navigate = useNavigate()
   const { setProfile} = useContext(UserContext)
   const [formData, setFormData] = useState({
+    email: '',
+    password: '',
+  });
+  const [formErrors, setFormErrors] = useState({
     email: '',
     password: '',
   });
@@ -31,14 +36,57 @@ const LoginForm = () => {
         const response = await axios.post('http://localhost:3001/auth/signin' , {email, password})
         const {user,sesID} = response.data
         setProfile({user,sesID})
-        console.log(user,sesID);
+        toast.success(`Welcome ${user.email}`, {
+          position: "top-center",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          });
         navigate("/posts")
       } catch (error) {
-        console.log(error);
+          if (error.response && error.response.status === 404 && error.response.data === "User not found") {
+            // Display error message to the user using react-toastify
+            toast.error('User not found', {
+              position: "top-center",
+              autoClose: 5000,
+              hideProgressBar: true,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+              theme: "light",
+              });
+          } 
+          if (error.response && error.response.status === 400 && error.response.data === "Invalid password") {
+            toast.error('Invalid password', {
+              position: "top-center",
+              autoClose: 5000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+              theme: "light",
+              });
+          }
+          else {
+            console.log('An error occurred:', error.message);
+          }
       }
     }
     else{
-      console.log('not good');
+      console.log('Form validation failed');
+      setTimeout(() => {
+        setFormErrors({
+          email: '',
+          password: '',
+          confirmPassword: '',
+        });
+      }, 3000)
     }
   };
 
@@ -46,15 +94,33 @@ const LoginForm = () => {
   const validateForm = () => {
     const { email, password } = formData;
     // Perform validation checks using the utility functions
+    let isValid = true;
     if (!validateEmail(email)) {
-      console.error('Invalid email address');
-      return false;
+      setFormErrors((prevErrors) => ({
+        ...prevErrors,
+        email: 'Invalid email address',
+      }));
+      isValid = false;
+    } else {
+      setFormErrors((prevErrors) => ({
+        ...prevErrors,
+        email: '',
+      }));
     }
+
     if (!validatePassword(password)) {
-      console.error('Password must be at least 8 characters long');
-      return false;
+      setFormErrors((prevErrors) => ({
+        ...prevErrors,
+        password: 'Password must be at least 8 characters long',
+      }));
+      isValid = false;
+    } else {
+      setFormErrors((prevErrors) => ({
+        ...prevErrors,
+        password: '',
+      }));
     }
-    return true;
+    return isValid
   };
 
   return (
@@ -69,6 +135,7 @@ const LoginForm = () => {
         placeholder="Email"
         className="block w-full h-9 px-4 sm:my-3 rounded-md border border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm transition-all duration-300 ease-in-out hover:border-indigo-500 hover:ring-indigo-500"
       />
+      {formErrors.email && <p className="text-red-500 text-sm mt-1">{formErrors.email}</p>}
       <label className="block text-sm font-medium leading-6 text-gray-900">Password</label>
       <input
         type="password"
@@ -78,6 +145,7 @@ const LoginForm = () => {
         placeholder="Password"
         className="block w-full sm:my-3 h-9 px-4 rounded-md border border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm transition-all duration-300 ease-in-out hover:border-indigo-500 hover:ring-indigo-500"
       />
+      {formErrors.password && <p className=" text-red-500 text-sm">{formErrors.password}</p>}
       <button type="submit" className="mt-5 h-10 bg-indigo-500 text-white font-semibold  px-4 rounded hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500">Login</button>
     </form>
     <img src={login} className='mx-auto my- sm:mr-28'></img>

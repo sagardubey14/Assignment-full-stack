@@ -1,11 +1,13 @@
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import axios from "axios"
 import UserContext from "../../Context/UserContext"
 import { useContext, useEffect, useState   } from "react"
 import { validateTitle, validateContent } from '../../utils/validation';
-import {useNavigate} from 'react-router-dom'
+import {Route, Routes, useNavigate} from 'react-router-dom'
 import Header from "./Header";
 import PostList from "./PostList";
-import Pagination from "./Pagination";
+import Profile from "../Profile";
 
 
 const Posts = ()=> {
@@ -18,6 +20,7 @@ const Posts = ()=> {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   
+  
   const headers ={
     'sesID':profile.sesID
   }
@@ -27,6 +30,16 @@ const Posts = ()=> {
     if (validatePost()) {
       await axios.post("http://localhost:3001/posts",{title,content},{headers})
       .then(res=>{
+        toast.success(`Post has been Created`, {
+          position: "top-center",
+          autoClose: 2000,
+          hideProgressBar: true,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          });
         if(data.length==5){
           console.log('The page size is not enough');
         }
@@ -40,13 +53,24 @@ const Posts = ()=> {
       console.log('not good');
     }
     setContent("")
+    setTitle("")
     
   }
 
   const logOut= ()=>{
     axios.post('http://localhost:3001/auth/logout')
     .then(res =>{
-      alert(res.data);
+      toast.success(`Logged Out`, {
+        position: "top-center",
+        autoClose: 2000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "dark",
+        });
+      console.log(res.data);
       setProfile({user:{
           name:'',
           username:'',
@@ -110,35 +134,17 @@ const Posts = ()=> {
     }
   }
 
-  useEffect(()=>{
-    window.addEventListener("scroll", handleScroll)
-    setLoading(true)
-    return () => window.removeEventListener("scroll", handleScroll)
-  },[])
-
 
   return (
     <div>
       <Header profile={profile} logOut={logOut} />
-      <PostList data={data} />
-      {loading && <p>Loading....</p>}
-      {error && console.log(error)}
-      <input
-        type="text"
-        name="title"
-        value={title}
-        onChange={(e)=>setTitle(e.target.value)}
-        placeholder="Title"
-      />
-      <input
-        type="text"
-        name="content"
-        value={content}
-        onChange={(e)=>setContent(e.target.value)}
-        placeholder="Content"
-      />
-      <button onClick={createPost}>Submit</button>
-    </div>
+      <Routes>
+        <Route path='/' element={<PostList data={data} setLoading={setLoading} handleScroll={handleScroll }title={title} setTitle={setTitle} createPost={createPost} content={content} setContent={setContent} />}/>
+        <Route path='/profile' element={<Profile />}/>
+      </Routes>
+      
+      {loading && <p className="text-gray-500 font-semibold text-lg mt-4 text-center">Loading....</p>}
+      </div>
   )
 }
 

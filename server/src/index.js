@@ -9,6 +9,7 @@ const cookieParser = require('cookie-parser');
 const multer = require('multer')
 const upload = multer({ dest: 'uploads/' });
 require('dotenv').config()
+const {updatePasswordMiddleware} = require('./middle/updatePassword')
 
 const app = express()
 
@@ -31,6 +32,12 @@ async function check(req,res,next){
     next()
 }
 app.use("/auth",upload.single('pfp') , authRoutes)
+
+
+// Use the middleware in your route for updating the password
+app.post('/updpass', updatePasswordMiddleware, (req, res) => {
+    res.status(200).json({ message: 'Password updated successfully' });
+});
 
 
 app.use("/posts",check, postRoutes)
