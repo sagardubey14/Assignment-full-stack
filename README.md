@@ -19,7 +19,7 @@ MelodyVerse is a full-stack web application that allows users to create posts, i
 - **Password Security**: Passwords are securely stored using bcrypt, a strong hashing algorithm.
 - **Environment Variables**: Sensitive information such as API keys and secret keys are stored as environment variables.
 
-## Technologies UsedTerminal Markdown Previewers: Some terminal-based markdown previewers, like mdcat or glow, allow you to preview markdown files directly in your terminal.
+## Technologies Used
 - **Node.js**: JavaScript runtime environment for server-side development.
 - **Express.js**: Web framework for Node.js, used for building the backend API.
 - **MongoDB**: NoSQL database for storing user data and posts.
